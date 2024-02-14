@@ -37,19 +37,14 @@ private ProductRepo productRepo;
 
 //
 //
-//@DeleteMapping("/orders/{orderId}")
-//    public String deleteOrderFromCart(@PathVariable("orderId") int orderId){
-//
-//
-//         Orders order=orderRepo.findById(orderId).orElse(null);
-//
-//         orderRepo.delete(order);
-//
-//
-//         return "Order removed ";
-//}
-//
-//
+@DeleteMapping("/orders/{orderId}")
+    public String deleteOrderFromCart(@PathVariable("orderId") int orderId){
+         Orders order=orderRepo.findById(orderId).orElse(null);
+         orderRepo.delete(order);
+         return "Order removed ";
+}
+
+
     @GetMapping("/orders/{userId}")
     public List<Orders> getallorders(@PathVariable("userId") int userId){
         User user = userRepo.findById(userId).get();
@@ -59,13 +54,10 @@ private ProductRepo productRepo;
     }
 
 
-
-
-
     @PostMapping("/{cartId}/orders")
     public String placeOrder(@PathVariable("cartId") int cartId){
+
     User user = userRepo.findById(cartId).get();
-//User user=userRepo.findById(userId).orElse(null);
  Cart cart=cartRepo.findById(user.getCart().getCartId()).orElse(null);
  Orders orders=new Orders();
 orders.setUser(user);
@@ -76,9 +68,11 @@ for(Product prod:cart.getProduct()){
 orders.setProducts(p);
 orderRepo.save(orders);
 
+//for clearing product from cart table when order is placed
 cart.getProduct().clear();
+cart.setQuantity(0);
+cart.setTotalPrice(0);
 cartRepo.save(cart);
-
 
 return "order placeed";
 
