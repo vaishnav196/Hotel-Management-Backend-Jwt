@@ -41,53 +41,62 @@ private  CartRepo cartRepo;
         return Cartproduct;
     }
 
-
     @PostMapping("/{cartId}/product/{productId}")
 
     public String addToCart(@PathVariable("cartId") int cartId,@PathVariable("productId") int productId){
+        double totalPrice=0;
+        int quantity=0;
         Cart cart= cartRepo.findById(cartId).orElse(null);
-        if(cart==null){
-            return "Nothing is there in Cart";
-        }
+//        if(cart==null){
+//            return "Nothing is there in Cart";
+//        }
         Product product=productRepo.findById(productId).orElse(null);
+//        List<Product> product=cart.getProduct();
         if(product==null){
             return "Product not Found";
         }
+
         cart.getProduct().add(product);
         cartRepo.save(cart);
-
+        for(Product pr:cart.getProduct()){
+            totalPrice= totalPrice +(pr.getPrice());
+            quantity++;
+        }
+        cart.setTotalPrice(totalPrice);
+        cart.setQuantity(quantity);
+        cartRepo.save(cart);
 
 
         return "Successfully added to cart ";
 
     }
 
-
-
-
-
     @DeleteMapping("{cartId}/product/{productId}")
     public String  deleteFromCart(@PathVariable("productId") int productId,@PathVariable("cartId") int cartId){
+        double totalPriceNew = 0;
         Cart cart =cartRepo.findById(cartId).orElse(null);
+        double totalPrice=cart.getTotalPrice();
+        int quantity=cart.getQuantity();
+
         Product product=productRepo.findById(productId).orElse(null);
         cart.getProduct().remove(product);
+        cartRepo.save(cart);
+         for(Product pr:cart.getProduct()){
+             totalPrice=(totalPriceNew)+(pr.getPrice());
+             quantity--;
+       }
 
+        cart.setTotalPrice(totalPrice);
+        cart.setQuantity(quantity);
+
+        if(totalPrice < 0 || quantity < 0){
+            cart.setTotalPrice(0);
+            cart.setQuantity(0);
+        }
         cartRepo.save(cart);
 
         return "product Removed From Cart";
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
