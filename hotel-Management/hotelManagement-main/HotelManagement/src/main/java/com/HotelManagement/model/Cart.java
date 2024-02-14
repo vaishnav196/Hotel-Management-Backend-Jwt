@@ -21,7 +21,12 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int cartId;
 
-//    private int quantity;
+
+    private double totalPrice=0;
+
+    private int quantity=0;
+
+    private double discountPercent;
 
 
 
