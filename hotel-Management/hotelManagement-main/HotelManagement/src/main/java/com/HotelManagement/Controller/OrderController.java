@@ -59,12 +59,19 @@ private ProductRepo productRepo;
 
     User user = userRepo.findById(cartId).get();
  Cart cart=cartRepo.findById(user.getCart().getCartId()).orElse(null);
+
+
  Orders orders=new Orders();
+ double  totalPrice=cart.getTotalPrice();
+ int quantity=cart.getQuantity();
+ orders.setTotalPrice(totalPrice);
+ orders.setQuantity(quantity);
 orders.setUser(user);
 List<Product> p=new ArrayList<>();
 for(Product prod:cart.getProduct()){
     p.add(prod);
 }
+
 orders.setProducts(p);
 orderRepo.save(orders);
 
@@ -76,6 +83,6 @@ cartRepo.save(cart);
 
 return "order placeed";
 
-    }
+}
 
 }
