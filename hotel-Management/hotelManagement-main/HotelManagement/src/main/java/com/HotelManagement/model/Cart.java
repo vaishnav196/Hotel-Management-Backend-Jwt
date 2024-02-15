@@ -26,9 +26,7 @@ public class Cart {
 
     private int quantity=0;
 
-    private double discountPercent;
-
-
+    private double discount;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JsonIgnoreProperties("orders")
