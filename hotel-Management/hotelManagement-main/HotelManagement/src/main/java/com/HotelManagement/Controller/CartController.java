@@ -4,6 +4,7 @@ import com.HotelManagement.Repository.CartRepo;
 import com.HotelManagement.Repository.ProductRepo;
 import com.HotelManagement.Repository.UserRepo;
 import com.HotelManagement.model.Cart;
+import com.HotelManagement.model.OfferCoupon;
 import com.HotelManagement.model.Product;
 import com.HotelManagement.model.User;
 import lombok.Data;
@@ -42,28 +43,28 @@ private  CartRepo cartRepo;
     }
 
     @PostMapping("/{cartId}/product/{productId}")
-
-    public String addToCart(@PathVariable("cartId") int cartId,@PathVariable("productId") int productId){
+    public String addToCart(@PathVariable("cartId") int cartId, @PathVariable("productId") int productId){
         double totalPrice=0;
         int quantity=0;
+//        double discount=0;
         Cart cart= cartRepo.findById(cartId).orElse(null);
-//        if(cart==null){
-//            return "Nothing is there in Cart";
-//        }
+        if(cart==null){
+            return "Nothing is there in Cart";
+        }
         Product product=productRepo.findById(productId).orElse(null);
-//        List<Product> product=cart.getProduct();
         if(product==null){
             return "Product not Found";
         }
-
         cart.getProduct().add(product);
         cartRepo.save(cart);
         for(Product pr:cart.getProduct()){
             totalPrice= totalPrice +(pr.getPrice());
             quantity++;
         }
+
+
         cart.setTotalPrice(totalPrice);
-        cart.setQuantity(quantity);
+      cart.setQuantity(quantity);
         cartRepo.save(cart);
 
 
@@ -74,16 +75,20 @@ private  CartRepo cartRepo;
     @DeleteMapping("{cartId}/product/{productId}")
     public String  deleteFromCart(@PathVariable("productId") int productId,@PathVariable("cartId") int cartId){
         double totalPriceNew = 0;
+
         Cart cart =cartRepo.findById(cartId).orElse(null);
-        double totalPrice=cart.getTotalPrice();
-        int quantity=cart.getQuantity();
+
 
         Product product=productRepo.findById(productId).orElse(null);
         cart.getProduct().remove(product);
+        int quantity=cart.getQuantity();
+         quantity=quantity-1;
+        double totalPrice=cart.getTotalPrice();
+
         cartRepo.save(cart);
          for(Product pr:cart.getProduct()){
-             totalPrice=(totalPriceNew)+(pr.getPrice());
-             quantity--;
+             totalPrice=(totalPrice)-(pr.getPrice());
+
        }
 
         cart.setTotalPrice(totalPrice);
@@ -93,10 +98,40 @@ private  CartRepo cartRepo;
             cart.setTotalPrice(0);
             cart.setQuantity(0);
         }
+
+        if(quantity==0 &&totalPrice!=0){
+            cart.setTotalPrice(0);
+        }
         cartRepo.save(cart);
 
         return "product Removed From Cart";
     }
 
+
+//    @DeleteMapping("{cartId}/product/{productId}")
+//    public String  deleteFromCart(@PathVariable("productId") int productId,@PathVariable("cartId") int cartId){
+//        double totalPriceNew = 0;
+//        Cart cart =cartRepo.findById(cartId).orElse(null);
+//        double totalPrice=cart.getTotalPrice();
+//        int quantity=cart.getQuantity();
+//
+//        Product product=productRepo.findById(productId).orElse(null);
+//        cart.getProduct().remove(product);
+//        cartRepo.save(cart);
+//        for(Product pr:cart.getProduct()){
+//            totalPrice=(totalPriceNew)+(pr.getPrice());
+//            quantity=quantity-1;
+//        }
+//        cart.setTotalPrice(totalPrice);
+//        cart.setQuantity(quantity);
+//
+//        if(totalPrice < 0 || quantity < 0){
+//            cart.setTotalPrice(0);
+//            cart.setQuantity(0);
+//        }
+//        cartRepo.save(cart);
+//
+//        return "product Removed From Cart";
+//    }
 
 }
